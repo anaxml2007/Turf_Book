@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurfMyShow - Book Sports Turfs</title>
+    <style>
+        :root {
+            --primary: #00b553;
+            --dark: #0f172a;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); }
+
+        /* Header */
+        header { background: var(--dark); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: bold; }
+        .logo span { color: var(--primary); }
+        .city-badge { background: #1e293b; border: 1px solid #334155; padding: 6px 14px; border-radius: 6px; cursor: pointer; color: white; }
+
+        /* Date Bar */
+        .date-bar { background: white; border-bottom: 1px solid var(--border); padding: 12px 5%; display: flex; gap: 10px; overflow-x: auto; }
+        .date-item { min-width: 60px; text-align: center; padding: 8px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+        .date-item.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Turf List Container */
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        .turf-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; gap: 20px; }
+        .turf-img { width: 220px; height: 150px; border-radius: 8px; object-fit: cover; background: #e2e8f0; }
+        .turf-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .turf-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .price { font-size: 16px; font-weight: bold; margin-top: 10px; }
+        .slots-grid { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .slot-btn { border: 1px solid var(--primary); color: var(--primary); background: white; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .slot-btn:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">⚽ Turf<span>MyShow</span></div>
+        <div class="city-badge">📍 Thrissur ▾</div>
+    </header>
+
+    <!-- Date Bar -->
+    <div class="date-bar">
+        <div class="date-item active">
+            <div style="font-size:11px;">THU</div>
+            <div style="font-size:18px; font-weight:bold;">06</div>
+            <div style="font-size:11px;">AUG</div>
+        </div>
+        <div class="date-item">
+            <div style="font-size:11px;">FRI</div>
+            <div style="font-size:18px; font-weight:bold;">07</div>
+            <div style="font-size:11px;">AUG</div>
+        </div>
+        <div class="date-item">
+            <div style="font-size:11px;">SAT</div>
+            <div style="font-size:18px; font-weight:bold;">08</div>
+            <div style="font-size:11px;">AUG</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3 style="margin-bottom: 20px; color: #64748b;">Available Turfs</h3>
+
+        <!-- Java/Thymeleaf dynamic loop -->
+        <div th:each="turf : ${turfs}" class="turf-card">
+            <img th:src="${turf.imageUrl != null ? turf.imageUrl : 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=500'}" class="turf-img" alt="Turf">
+            
+            <div class="turf-info">
+                <div>
+                    <div class="turf-header">
+                        <h2 th:text="${turf.name}">Turf Name</h2>
+                        <span style="background: #15803d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">★ 4.8</span>
+                    </div>
+                    <p style="color: #64748b; font-size: 14px; margin-top: 4px;" th:text="'📍 ' + ${turf.location}">Location</p>
+                </div>
+
+                <div>
+                    <div class="price" th:text="'From ₹' + ${turf.pricePerHour} + ' /hr'">From ₹800 /hr</div>
+                    <div class="slots-grid">
+                        <button class="slot-btn">06:00 AM</button>
+                        <button class="slot-btn">07:00 AM</button>
+                        <button class="slot-btn">08:00 AM</button>
+                        <button class="slot-btn">09:00 AM</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
