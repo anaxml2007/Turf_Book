@@ -1,99 +1,490 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TurfMyShow - Book Sports Turfs</title>
+    <title>Turf Booking System</title>
     <style>
-        :root {
-            --primary: #00b553;
-            --dark: #0f172a;
-            --bg: #f8fafc;
-            --border: #e2e8f0;
-            --text: #1e293b;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); }
+        body {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #333;
+        }
 
-        /* Header */
-        header { background: var(--dark); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: bold; }
-        .logo span { color: var(--primary); }
-        .city-badge { background: #1e293b; border: 1px solid #334155; padding: 6px 14px; border-radius: 6px; cursor: pointer; color: white; }
+        /* Login Page Styling */
+        #login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-        /* Date Bar */
-        .date-bar { background: white; border-bottom: 1px solid var(--border); padding: 12px 5%; display: flex; gap: 10px; overflow-x: auto; }
-        .date-item { min-width: 60px; text-align: center; padding: 8px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
-        .date-item.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .login-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            width: 100%;
+            max-width: 400px;
+            color: #fff;
+            text-align: center;
+        }
 
-        /* Turf List Container */
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-        .turf-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; gap: 20px; }
-        .turf-img { width: 220px; height: 150px; border-radius: 8px; object-fit: cover; background: #e2e8f0; }
-        .turf-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .turf-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        
-        .price { font-size: 16px; font-weight: bold; margin-top: 10px; }
-        .slots-grid { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-        .slot-btn { border: 1px solid var(--primary); color: var(--primary); background: white; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .slot-btn:hover { background: var(--primary); color: white; }
+        .login-card h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.8);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: #218838;
+        }
+
+        /* Home Page Styling (ബാക്ക്ഗ്രൗണ്ട് കൊടുത്തിരിക്കുന്നത് ഇവിടെയാണ്) */
+        #home-page {
+            display: none;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        nav {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-add {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .turf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .turf-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .turf-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .turf-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .turf-details {
+            padding: 20px;
+        }
+
+        .turf-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .turf-info {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .price-tag {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 10px;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .btn-action {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-edit { background: #ffc107; color: #000; }
+        .btn-delete { background: #dc3545; color: #fff; }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">⚽ Turf<span>MyShow</span></div>
-        <div class="city-badge">📍 Thrissur ▾</div>
-    </header>
-
-    <!-- Date Bar -->
-    <div class="date-bar">
-        <div class="date-item active">
-            <div style="font-size:11px;">THU</div>
-            <div style="font-size:18px; font-weight:bold;">06</div>
-            <div style="font-size:11px;">AUG</div>
-        </div>
-        <div class="date-item">
-            <div style="font-size:11px;">FRI</div>
-            <div style="font-size:18px; font-weight:bold;">07</div>
-            <div style="font-size:11px;">AUG</div>
-        </div>
-        <div class="date-item">
-            <div style="font-size:11px;">SAT</div>
-            <div style="font-size:18px; font-weight:bold;">08</div>
-            <div style="font-size:11px;">AUG</div>
+    <!-- Login Page -->
+    <div id="login-page">
+        <div class="login-card">
+            <h2>LOGIN</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn-login">SIGN IN</button>
+            </form>
         </div>
     </div>
 
-    <div class="container">
-        <h3 style="margin-bottom: 20px; color: #64748b;">Available Turfs</h3>
+    <!-- Home Page -->
+    <div id="home-page">
+        <nav>
+            <div class="nav-brand">Turf Booking System</div>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </nav>
 
-        <!-- Java/Thymeleaf dynamic loop -->
-        <div th:each="turf : ${turfs}" class="turf-card">
-            <img th:src="${turf.imageUrl != null ? turf.imageUrl : 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=500'}" class="turf-img" alt="Turf">
-            
-            <div class="turf-info">
-                <div>
-                    <div class="turf-header">
-                        <h2 th:text="${turf.name}">Turf Name</h2>
-                        <span style="background: #15803d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">★ 4.8</span>
-                    </div>
-                    <p style="color: #64748b; font-size: 14px; margin-top: 4px;" th:text="'📍 ' + ${turf.location}">Location</p>
-                </div>
+        <div class="controls">
+            <input type="text" class="search-box" id="searchInput" placeholder="Search by name or location..." onkeyup="filterTurfs()">
+            <button class="btn-add" onclick="openModal()">+ Add New Turf</button>
+        </div>
 
-                <div>
-                    <div class="price" th:text="'From ₹' + ${turf.pricePerHour} + ' /hr'">From ₹800 /hr</div>
-                    <div class="slots-grid">
-                        <button class="slot-btn">06:00 AM</button>
-                        <button class="slot-btn">07:00 AM</button>
-                        <button class="slot-btn">08:00 AM</button>
-                        <button class="slot-btn">09:00 AM</button>
-                    </div>
-                </div>
-            </div>
+        <div class="turf-grid" id="turfContainer">
+            <!-- Dynamic Turf Cards Will Be Inserted Here -->
         </div>
     </div>
 
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="turfModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Add New Turf</h3>
+            <form id="turfForm" onsubmit="saveTurf(event)">
+                <input type="hidden" id="turfId">
+                <input type="text" id="turfName" placeholder="Turf Name" required>
+                <input type="text" id="turfLocation" placeholder="Location" required>
+                <input type="number" id="turfPrice" placeholder="Price per Hour (₹)" required>
+                <input type="text" id="turfSlots" placeholder="Available Slots (e.g. 6:00 PM - 7:00 PM)" required>
+                <input type="file" id="turfImageFile" accept="image/*">
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allTurfs = [];
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if (u === 'admin' && p === '1234') {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('home-page').style.display = 'block';
+                fetchTurfs();
+            } else {
+                alert('Invalid Credentials!');
+            }
+        }
+
+        function logout() {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('login-page').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+        }
+
+        function fetchTurfs() {
+            fetch('/api/turfs')
+                .then(res => res.json())
+                .then(data => {
+                    allTurfs = data;
+                    renderTurfs(allTurfs);
+                })
+                .catch(err => console.error('Error fetching turfs:', err));
+        }
+
+        function renderTurfs(turfs) {
+            const container = document.getElementById('turfContainer');
+            container.innerHTML = '';
+
+            turfs.forEach(turf => {
+                const card = document.createElement('div');
+                card.className = 'turf-card';
+                card.innerHTML = `
+                    <img src="${turf.imageUrl || '/images/turf1.jpg'}" alt="${turf.name}" onerror="this.src='/images/turf1.jpg'">
+                    <div class="turf-details">
+                        <div class="turf-title">${turf.name}</div>
+                        <div class="turf-info">📍 ${turf.location}</div>
+                        <div class="turf-info">⏰ Slots: ${turf.availableSlots || 'N/A'}</div>
+                        <div class="price-tag">₹${turf.price} / hr</div>
+                        <div class="card-actions">
+                            <button class="btn-action btn-edit" onclick="editTurf(${turf.id})">Edit</button>
+                            <button class="btn-action btn-delete" onclick="deleteTurf(${turf.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterTurfs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allTurfs.filter(t => 
+                t.name.toLowerCase().includes(query) || 
+                t.location.toLowerCase().includes(query)
+            );
+            renderTurfs(filtered);
+        }
+
+        function openModal() {
+            document.getElementById('modalTitle').innerText = 'Add New Turf';
+            document.getElementById('turfId').value = '';
+            document.getElementById('turfForm').reset();
+            document.getElementById('turfModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('turfModal').style.display = 'none';
+        }
+
+        function editTurf(id) {
+            const turf = allTurfs.find(t => t.id === id);
+            if (!turf) return;
+
+            document.getElementById('modalTitle').innerText = 'Edit Turf';
+            document.getElementById('turfId').value = turf.id;
+            document.getElementById('turfName').value = turf.name;
+            document.getElementById('turfLocation').value = turf.location;
+            document.getElementById('turfPrice').value = turf.price;
+            document.getElementById('turfSlots').value = turf.availableSlots || '';
+            document.getElementById('turfModal').style.display = 'flex';
+        }
+
+        function saveTurf(event) {
+    event.preventDefault();
+    const id = document.getElementById('turfId').value;
+    const name = document.getElementById('turfName').value;
+    const location = document.getElementById('turfLocation').value;
+    const price = parseFloat(document.getElementById('turfPrice').value);
+    const availableSlots = document.getElementById('turfSlots').value;
+    const imageFile = document.getElementById('turfImageFile').files[0];
+
+    // ഫയൽ സെലക്ട് ചെയ്തിട്ടുണ്ടെങ്കിൽ അതിന്റെ പേര് വഴി പാത്ത് ഉണ്ടാക്കുന്നു
+    let imageUrl = '/images/turf1.jpg';
+    if (imageFile) {
+        imageUrl = '/images/' + imageFile.name;
+    }
+
+    const turfData = {
+        name: name,
+        location: location,
+        price: price,
+        availableSlots: availableSlots,
+        imageUrl: imageUrl
+    };
+
+    const url = id ? `/api/turfs/${id}` : '/api/turfs';
+    const method = id ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(turfData)
+    })
+    .then(res => {
+        if (res.ok) {
+            closeModal();
+            fetchTurfs();
+        } else {
+            alert('Failed to save turf');
+        }
+    })
+    .catch(err => console.error('Error saving turf:', err));
+}
+
+        function deleteTurf(id) {
+            if (confirm('Are you sure you want to delete this turf?')) {
+                fetch(`/api/turfs/${id}`, { method: 'DELETE' })
+                    .then(res => {
+                        if (res.ok) {
+                            fetchTurfs();
+                        } else {
+                            alert('Failed to delete turf');
+                        }
+                    })
+                    .catch(err => console.error('Error deleting turf:', err));
+            }
+        }
+    </script>
 </body>
 </html>

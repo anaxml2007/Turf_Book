@@ -3,48 +3,22 @@ package com.turfbooking.config;
 import com.turfbooking.model.Turf;
 import com.turfbooking.repository.TurfRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+@Component
+public class DataInitializer implements CommandLineRunner {
 
-@Configuration
-public class DataInitializer {
+    private final TurfRepository turfRepository;
 
-    @Bean
-    CommandLineRunner initDatabase(TurfRepository turfRepository) {
-        return args -> {
-            if (turfRepository.count() == 0) {
-                Turf turf1 = new Turf(
-                        "Metro Soccer Turf",
-                        "Thrissur",
-                        "Round West, Thrissur",
-                        4.8,
-                        Arrays.asList("5-a-side", "Floodlights", "Parking"),
-                        "https://example.com/turf1.jpg"
-                );
+    public DataInitializer(TurfRepository turfRepository) {
+        this.turfRepository = turfRepository;
+    }
 
-                Turf turf2 = new Turf(
-                        "Kalyan Sports Arena",
-                        "Thrissur",
-                        "Kodungallur Road, Thrissur",
-                        4.6,
-                        Arrays.asList("7-a-side", "Cafeteria"),
-                        "https://example.com/turf2.jpg"
-                );
-
-                Turf turf3 = new Turf(
-                        "Kochi Turf Park",
-                        "Kochi",
-                        "Edappally, Kochi",
-                        4.9,
-                        Arrays.asList("5-a-side", "A/C Locker Room"),
-                        "https://example.com/turf3.jpg"
-                );
-
-                turfRepository.saveAll(Arrays.asList(turf1, turf2, turf3));
-                System.out.println("Sample turf data initialized!");
-            }
-        };
+    @Override
+    public void run(String... args) throws Exception {
+        if (turfRepository.count() == 0) {
+            turfRepository.save(new Turf("Green Arena", "Thrissur", 1200.0, "6:00 PM - 7:00 PM", "/images/turf1.jpg"));
+            turfRepository.save(new Turf("Kickoff Turf", "Kochi", 1500.0, "7:00 PM - 8:00 PM", "/images/turf2.jpg"));
+        }
     }
 }

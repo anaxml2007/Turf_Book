@@ -1,2 +1,10 @@
 com/turfbooking/controller/BookingController.class
+com/turfbooking/config/WebConfig.class
+com/turfbooking/repository/TurfRepository.class
 com/turfbooking/model/Turf.class
+com/turfbooking/service/BookingService.class
+com/turfbooking/config/DataInitializer.class
+com/turfbooking/TurfBookingApplication.class
+com/turfbooking/repository/BookingRepository.class
+com/turfbooking/controller/TurfController.class
+com/turfbooking/model/Booking.class
