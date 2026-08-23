@@ -1,8 +1,7 @@
 package com.turfbooking.controller;
 
 import com.turfbooking.model.Booking;
-import com.turfbooking.service.BookingService;
-import org.springframework.http.HttpStatus;
+import com.turfbooking.repository.BookingRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,24 +12,21 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class BookingController {
 
-    private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
 
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
+    public BookingController(BookingRepository bookingRepository) {
+        this.bookingRepository = bookingRepository;
     }
 
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
-        try {
-            Booking savedBooking = bookingService.createBooking(booking);
-            return new ResponseEntity<>(savedBooking, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<Booking> createBooking(@RequestBody Booking booking) {
+        booking.setStatus("CONFIRMED");
+        Booking saved = bookingRepository.save(booking);
+        return ResponseEntity.ok(saved);
     }
 
     @GetMapping
-    public ResponseEntity<List<Booking>> getAllBookings() {
-        return ResponseEntity.ok(bookingService.getAllBookings());
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
     }
 }

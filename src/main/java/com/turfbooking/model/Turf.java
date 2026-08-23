@@ -1,11 +1,9 @@
 package com.turfbooking.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "turfs")
 public class Turf {
 
     @Id
@@ -14,21 +12,25 @@ public class Turf {
 
     private String name;
     private String location;
-    private Double price;
-    private String availableSlots;
+    private double price;
+    
+    private String openTime;
+    private String closeTime;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String imageUrl;
 
     public Turf() {}
 
-    public Turf(String name, String location, Double price, String availableSlots, String imageUrl) {
+    public Turf(String name, String location, double price, String openTime, String closeTime, String imageUrl) {
         this.name = name;
         this.location = location;
         this.price = price;
-        this.availableSlots = availableSlots;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
         this.imageUrl = imageUrl;
     }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -38,11 +40,14 @@ public class Turf {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public String getAvailableSlots() { return availableSlots; }
-    public void setAvailableSlots(String availableSlots) { this.availableSlots = availableSlots; }
+    public String getOpenTime() { return openTime; }
+    public void setOpenTime(String openTime) { this.openTime = openTime; }
+
+    public String getCloseTime() { return closeTime; }
+    public void setCloseTime(String closeTime) { this.closeTime = closeTime; }
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }

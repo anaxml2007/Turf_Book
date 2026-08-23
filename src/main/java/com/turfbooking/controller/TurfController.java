@@ -24,29 +24,8 @@ public class TurfController {
     }
 
     @PostMapping
-    public ResponseEntity<Turf> addTurf(@RequestBody Turf turf) {
-        if (turf.getImageUrl() == null || turf.getImageUrl().trim().isEmpty()) {
-            turf.setImageUrl("/images/turf1.jpg");
-        }
-        Turf savedTurf = turfRepository.save(turf);
-        return ResponseEntity.ok(savedTurf);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Turf> updateTurf(@PathVariable Long id, @RequestBody Turf turfDetails) {
-        return turfRepository.findById(id)
-                .map(turf -> {
-                    turf.setName(turfDetails.getName());
-                    turf.setLocation(turfDetails.getLocation());
-                    turf.setPrice(turfDetails.getPrice());
-                    turf.setAvailableSlots(turfDetails.getAvailableSlots());
-                    if (turfDetails.getImageUrl() != null && !turfDetails.getImageUrl().trim().isEmpty()) {
-                        turf.setImageUrl(turfDetails.getImageUrl());
-                    }
-                    Turf updatedTurf = turfRepository.save(turf);
-                    return ResponseEntity.ok(updatedTurf);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public Turf addTurf(@RequestBody Turf turf) {
+        return turfRepository.save(turf);
     }
 
     @DeleteMapping("/{id}")

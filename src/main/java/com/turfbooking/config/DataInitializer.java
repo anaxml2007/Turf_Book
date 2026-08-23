@@ -17,8 +17,8 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (turfRepository.count() == 0) {
-            turfRepository.save(new Turf("Green Arena", "Thrissur", 1200.0, "6:00 PM - 7:00 PM", "/images/turf1.jpg"));
-            turfRepository.save(new Turf("Kickoff Turf", "Kochi", 1500.0, "7:00 PM - 8:00 PM", "/images/turf2.jpg"));
+            turfRepository.save(new Turf("Green Arena", "Thrissur", 1200.0, "05:00", "23:00", "/images/turf1.jpg"));
+            turfRepository.save(new Turf("Kickoff Turf", "Kochi", 1500.0, "06:00", "00:00", "/images/turf2.jpg"));
         }
     }
 }
