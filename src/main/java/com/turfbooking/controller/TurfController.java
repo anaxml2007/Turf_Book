@@ -28,6 +28,26 @@ public class TurfController {
         return turfRepository.save(turf);
     }
 
+    // UPDATE TURF (EDIT API)
+    @PutMapping("/{id}")
+    public ResponseEntity<Turf> updateTurf(@PathVariable Long id, @RequestBody Turf updatedTurf) {
+        return turfRepository.findById(id).map(turf -> {
+            turf.setName(updatedTurf.getName());
+            turf.setLocation(updatedTurf.getLocation());
+            turf.setPrice(updatedTurf.getPrice());
+            turf.setOpenTime(updatedTurf.getOpenTime());
+            turf.setCloseTime(updatedTurf.getCloseTime());
+            
+            // പുതിയ ഇമേജ് അയച്ചിട്ടുണ്ടെങ്കിൽ മാത്രം അപ്ഡേറ്റ് ചെയ്യും
+            if (updatedTurf.getImageUrl() != null && !updatedTurf.getImageUrl().trim().isEmpty()) {
+                turf.setImageUrl(updatedTurf.getImageUrl());
+            }
+            
+            Turf savedTurf = turfRepository.save(turf);
+            return ResponseEntity.ok(savedTurf);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTurf(@PathVariable Long id) {
         if (turfRepository.existsById(id)) {

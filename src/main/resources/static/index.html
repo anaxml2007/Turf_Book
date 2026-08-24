@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turf Booking System</title>
+    <!-- Celebration / Confetti Animation CDN Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         
@@ -42,6 +44,9 @@
         .btn-blue:hover { background: #0069d9; }
         .btn-red { background: #dc3545; color: white; }
         .btn-red:hover { background: #c82333; }
+        
+        .btn-yellow { background: #ffc107; color: #212529; }
+        .btn-yellow:hover { background: #e0a800; }
 
         nav.glass-card { padding: 15px 25px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .nav-title { font-size: 20px; font-weight: bold; }
@@ -54,7 +59,6 @@
         .role-card { flex: 1; min-width: 260px; max-width: 320px; padding: 40px 25px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
         .role-card:hover { transform: translateY(-8px) scale(1.02); background: rgba(255, 255, 255, 0.25); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); }
         
-        /* Icon styling updated to ensure consistent large display size */
         .role-icon { font-size: 60px; margin-bottom: 15px; display: inline-block; line-height: 1; }
         
         .role-title { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
@@ -76,6 +80,8 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1000; }
         .modal-body { background: #fff; color: #222; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; }
         .ticket { border: 2px dashed #28a745; padding: 20px; border-radius: 10px; background: #f8f9fa; margin-top: 15px; color: #333; }
+        
+        .action-btn-container { display: flex; gap: 10px; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -110,7 +116,6 @@
             <p>Please select your account mode to proceed</p>
             
             <div class="role-grid">
-                <!-- Turf Owner card now uses Goal Post emoji (🥅) in large size -->
                 <div class="glass-card role-card" onclick="openOwnerPanel()">
                     <div class="role-icon">🥅</div>
                     <div class="role-title">Turf Owner</div>
@@ -190,6 +195,45 @@
         </div>
     </div>
 
+    <!-- EDIT TURF MODAL -->
+    <div class="modal" id="editTurfModal">
+        <div class="modal-body">
+            <h3 style="margin-bottom: 15px;">Edit Turf Details</h3>
+            <form onsubmit="updateTurf(event)">
+                <input type="hidden" id="editTurfId">
+                <input type="hidden" id="existingImageUrl">
+
+                <label style="font-size:12px; font-weight:bold;">Turf Name:</label>
+                <input type="text" id="editTurfName" required style="width:100%; padding:10px; margin:6px 0; border:1px solid #ccc; border-radius:6px;">
+                
+                <label style="font-size:12px; font-weight:bold;">Location:</label>
+                <input type="text" id="editTurfLocation" required style="width:100%; padding:10px; margin:6px 0; border:1px solid #ccc; border-radius:6px;">
+                
+                <label style="font-size:12px; font-weight:bold;">Price per Hour (₹):</label>
+                <input type="number" id="editTurfPrice" required style="width:100%; padding:10px; margin:6px 0; border:1px solid #ccc; border-radius:6px;">
+                
+                <div style="display:flex; gap:10px; margin:6px 0;">
+                    <div style="flex:1;">
+                        <label style="font-size:12px; font-weight:bold;">Opening Time:</label>
+                        <input type="time" id="editOpenTime" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:12px; font-weight:bold;">Closing Time:</label>
+                        <input type="time" id="editCloseTime" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+                    </div>
+                </div>
+
+                <label style="display:block; margin-top:8px; font-weight:bold; font-size:13px;">Change Image (Optional):</label>
+                <input type="file" id="editTurfFile" accept="image/*" style="width:100%; padding:8px; margin:6px 0; border:1px solid #ccc; border-radius:6px; background:#f9f9f9;">
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="button" class="btn btn-red" onclick="closeModal('editTurfModal')">Cancel</button>
+                    <button type="submit" class="btn btn-yellow">Update Turf</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- BOOKING MODAL -->
     <div class="modal" id="bookingModal">
         <div class="modal-body">
@@ -231,7 +275,9 @@
         let currentPricePerHour = 0;
         let selectedTurfOpenTime = "00:00";
         let selectedTurfCloseTime = "23:59";
+        let allTurfsCache = [];
 
+        // Function to toggle between views
         function showPage(id) {
             document.querySelectorAll('.view').forEach(v => {
                 v.classList.remove('active-view');
@@ -242,6 +288,7 @@
             activePage.classList.add('active-view');
         }
 
+        // Handle User Login
         function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('username').value.trim();
@@ -268,6 +315,7 @@
             loadUserTurfs();
         }
 
+        // Open Modal to Add New Turf
         function openAddTurfModal() {
             document.getElementById('newTurfName').value = '';
             document.getElementById('newTurfLocation').value = '';
@@ -278,6 +326,7 @@
             document.getElementById('addTurfModal').style.display = 'flex';
         }
 
+        // Save New Turf Data to Backend
         function saveTurf(e) {
             e.preventDefault();
             const fileInput = document.getElementById('newTurfFile');
@@ -313,6 +362,66 @@
             }
         }
 
+        // Open Modal to Edit Existing Turf
+        function openEditTurfModal(id) {
+            const turf = allTurfsCache.find(t => t.id === id);
+            if (!turf) return;
+
+            document.getElementById('editTurfId').value = turf.id;
+            document.getElementById('editTurfName').value = turf.name;
+            document.getElementById('editTurfLocation').value = turf.location;
+            document.getElementById('editTurfPrice').value = turf.price;
+            document.getElementById('editOpenTime').value = turf.openTime || '05:00';
+            document.getElementById('editCloseTime').value = turf.closeTime || '23:00';
+            document.getElementById('existingImageUrl').value = turf.imageUrl || '/images/turf1.jpg';
+            document.getElementById('editTurfFile').value = '';
+
+            document.getElementById('editTurfModal').style.display = 'flex';
+        }
+
+        // Update Turf Details via PUT API
+        function updateTurf(e) {
+            e.preventDefault();
+            const id = document.getElementById('editTurfId').value;
+            const fileInput = document.getElementById('editTurfFile');
+            const existingImg = document.getElementById('existingImageUrl').value;
+
+            const sendUpdateReq = (imgData) => {
+                const updatedData = {
+                    name: document.getElementById('editTurfName').value,
+                    location: document.getElementById('editTurfLocation').value,
+                    price: parseFloat(document.getElementById('editTurfPrice').value),
+                    openTime: document.getElementById('editOpenTime').value,
+                    closeTime: document.getElementById('editCloseTime').value,
+                    imageUrl: imgData || existingImg
+                };
+
+                fetch(`/api/turfs/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                }).then(r => {
+                    if (r.ok) {
+                        closeModal('editTurfModal');
+                        loadOwnerTurfs();
+                    } else {
+                        alert("Could not update turf.");
+                    }
+                }).catch(err => alert("Error updating turf"));
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    sendUpdateReq(e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                sendUpdateReq(existingImg);
+            }
+        }
+
+        // Delete Turf via DELETE API
         function deleteTurf(id) {
             if (confirm("Are you sure you want to delete this turf?")) {
                 fetch(`/api/turfs/${id}`, { method: 'DELETE' })
@@ -326,6 +435,7 @@
             }
         }
 
+        // Render Horizontal Date Bar
         function renderHorizontalDates() {
             const container = document.getElementById('dateBarContainer');
             container.innerHTML = '';
@@ -345,6 +455,7 @@
             }
         }
 
+        // Fetch and Render Turfs for User View
         function loadUserTurfs() {
             fetch('/api/turfs').then(r => r.json()).then(turfs => {
                 const container = document.getElementById('userTurfContainer');
@@ -367,8 +478,10 @@
             });
         }
 
+        // Fetch and Render Turfs for Owner Panel
         function loadOwnerTurfs() {
             fetch('/api/turfs').then(r => r.json()).then(turfs => {
+                allTurfsCache = turfs;
                 const container = document.getElementById('ownerTurfContainer');
                 if (turfs.length === 0) {
                     container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No turfs added yet.</p>';
@@ -382,13 +495,17 @@
                             <p>📍 ${t.location}</p>
                             <p style="font-size:13px; color:#666;">🕒 Hours: ${t.openTime || '05:00'} - ${t.closeTime || '23:00'}</p>
                             <p class="price-text">₹${t.price} / hour</p>
-                            <button class="btn btn-red" onclick="deleteTurf(${t.id})" style="margin-top:10px;">Delete Turf</button>
+                            <div class="action-btn-container">
+                                <button class="btn btn-yellow" onclick="openEditTurfModal(${t.id})">Edit Turf</button>
+                                <button class="btn btn-red" onclick="deleteTurf(${t.id})">Delete Turf</button>
+                            </div>
                         </div>
                     </div>
                 `).join('');
             });
         }
 
+        // Prepare Booking Modal
         function initiateBooking(id, name, price, openT, closeT) {
             document.getElementById('bookTurfId').value = id;
             document.getElementById('bookTurfName').innerText = name;
@@ -401,11 +518,13 @@
             document.getElementById('bookingModal').style.display = 'flex';
         }
 
+        // Recalculate Booking Price Dynamically
         function recalculatePrice() {
             const hrs = parseInt(document.getElementById('playHours').value) || 1;
             document.getElementById('totalCalcPrice').innerText = hrs * currentPricePerHour;
         }
 
+        // Submit Booking Request
         function processBooking(e) {
             e.preventDefault();
             const hrs = parseInt(document.getElementById('playHours').value);
@@ -456,6 +575,32 @@
             }).catch(err => alert("Booking Error: Check details or slot availability"));
         }
 
+        // Trigger Confetti Rain Effect above Ticket Modal
+        function triggerTopConfettiShower() {
+            if (typeof confetti === 'function') {
+                var duration = 3 * 1000; // 3 seconds shower duration
+                var end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 7,
+                        angle: 90,
+                        spread: 180,
+                        origin: { x: Math.random(), y: -0.1 },
+                        startVelocity: 15,
+                        gravity: 0.8,
+                        scalar: 1.2,
+                        zIndex: 99999 // Brings confetti over the Ticket Modal
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                })();
+            }
+        }
+
+        // Display Ticket Modal and Trigger Celebration
         function showBookingTicket(b) {
             document.getElementById('ticketContent').innerHTML = `
                 <h4 style="text-align:center; border-bottom:1px solid #ccc; padding-bottom:8px; margin-bottom:10px;">TURF ENTRY TICKET</h4>
@@ -469,6 +614,9 @@
                 <p style="color:green; font-weight:bold; text-align:center; margin-top:12px;">STATUS: VERIFIED & CONFIRMED</p>
             `;
             document.getElementById('ticketModal').style.display = 'flex';
+            
+            // Trigger Confetti Animation
+            triggerTopConfettiShower();
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
