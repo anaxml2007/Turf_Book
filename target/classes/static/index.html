@@ -77,15 +77,14 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; z-index: 1000; }
         .modal-body { background: #fff; color: #222; padding: 30px; border-radius: 16px; width: 90%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-        .ticket { border: 2px dashed #28a745; padding: 20px; border-radius: 10px; background: #f8f9fa; margin-top: 15px; color: #333; }
 
         .membership-badge { background: #ffc107; color: #111; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-left: 10px; display: inline-block; cursor: pointer; transition: 0.2s; }
         .membership-badge:hover { background: #e0a800; transform: scale(1.05); }
+        
         .slot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
         .slot-btn { padding: 8px 5px; font-size: 12px; border: 1px solid #28a745; background: #e8f5e9; color: #28a745; border-radius: 6px; cursor: pointer; text-align: center; font-weight: bold; }
         .slot-btn.selected { background: #28a745; color: #fff; }
         
-        /* Disabled Slot Styling for Already Booked Slots */
         .slot-btn.disabled {
             background: #ffebee !important;
             color: #c62828 !important;
@@ -96,15 +95,12 @@
         }
 
         .lock-banner { background: #fff3cd; color: #856404; padding: 8px; border-radius: 6px; font-size: 13px; margin-bottom: 10px; text-align: center; font-weight: bold; border: 1px solid #ffeeba; }
-        
         .readonly-input { background: #e9ecef !important; cursor: not-allowed; }
 
-        /* Subscription Card Styling */
         .sub-card { border: 2px solid #ddd; padding: 15px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; text-align: left; }
         .sub-card:hover { border-color: #28a745; background: #f8f9fa; }
         .sub-card.selected { border-color: #28a745; background: #e8f5e9; }
 
-        /* Payment Option Card Styling */
         .pay-option {
             display: flex;
             align-items: center;
@@ -118,22 +114,13 @@
         }
         .pay-option:hover { border-color: #28a745; background: #f0fff4; }
         .pay-option input[type="radio"] { accent-color: #28a745; transform: scale(1.2); }
-          /* Duration Buttons Layout */
-#durationBtnGroup .duration-btn {
-  flex: 1;
-  padding: 8px 12px;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: all 0.2s ease-in-out;
-}
 
-/* Selected Active Duration Button */
-#durationBtnGroup .duration-btn.active {
-  background-color: #198754 !important;
-  color: #ffffff !important;
-  border-color: #198754 !important;
-}
-    
+        .duration-btn-group { display: flex; gap: 10px; margin-top: 5px; }
+        .duration-btn {
+            flex: 1; border: 1px solid #198754; color: #198754; background-color: transparent;
+            padding: 8px 0; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s ease-in-out;
+        }
+        .duration-btn.active { background-color: #198754; color: white; }
     </style>
 </head>
 <body>
@@ -357,7 +344,6 @@
                 ⏱️ Slot locked! Complete booking in <span id="lockCountdown">05:00</span>
             </div>
 
-            <!-- Handled via payment gateway before confirmation -->
             <form onsubmit="openBookingPaymentGateway(event)">
                 <input type="hidden" id="bookTurfId">
                 <p style="margin-bottom: 10px;"><strong>Turf:</strong> <span id="bookTurfName"></span></p>
@@ -365,21 +351,19 @@
                 <input type="text" id="custName" placeholder="Your Name" required style="width:100%; padding:10px; margin:6px 0; border:1px solid #ccc; border-radius:6px;">
                 <input type="tel" id="custPhone" placeholder="Mobile Number (10 digits)" pattern="[6-9][0-9]{9}" required style="width:100%; padding:10px; margin:6px 0; border:1px solid #ccc; border-radius:6px;">
                 
-                <label style="display:block; margin-top:8px; font-weight:bold; font-size:14px;">Select Available Time Slot:</label>
+                <div style="margin-top:10px;">
+                    <label style="font-weight:bold; font-size:14px;">Playing Duration:</label>
+                    <div class="duration-btn-group">
+                        <button type="button" class="duration-btn active" onclick="setDuration(1, this)">1 Hour</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(2, this)">2 Hours</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(3, this)">3 Hours</button>
+                    </div>
+                </div>
+
+                <label style="display:block; margin-top:12px; font-weight:bold; font-size:14px;">Select Start Time Slot:</label>
                 <div class="slot-grid" id="interactiveSlotGrid"></div>
-
                 <input type="hidden" id="slotTime" value="18:00">
-                <!-- Duration Selection Buttons (Max 3 Hours) -->
-<div class="mb-3">
-  <label class="form-label font-weight-bold">Playing Duration:</label>
-  <div class="d-flex flex-row justify-content-between gap-2" id="durationBtnGroup">
-    <button type="button" class="btn btn-outline-success duration-btn active" onclick="setDuration(1, this)">1 Hour</button>
-    <button type="button" class="btn btn-outline-success duration-btn" onclick="setDuration(2, this)">2 Hours</button>
-    <button type="button" class="btn btn-outline-success duration-btn" onclick="setDuration(3, this)">3 Hours</button>
-  </div>
-</div>
 
-                                
                 <div style="background: #f1f8e9; padding: 10px; border-radius: 8px; margin: 10px 0; border: 1px solid #c8e6c9;">
                     <p style="font-size:13px; color:#333;">Base Rate: ₹<span id="baseRateTxt">0</span>/hr</p>
                     <p style="font-size:13px; color:#d32f2f;" id="dynamicRateInfo">Peak Hours Rate: Standard</p>
@@ -439,142 +423,121 @@
         </div>
     </div>
 
-<!-- BOOKMYSHOW STYLE TICKET MODAL -->
-<div class="modal" id="ticketModal">
-    <div class="modal-body" style="background: #f2f2f2; border-radius: 18px; padding: 20px; max-width: 420px; color: #333;">
-        
-        <!-- Top Bar -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <span style="font-weight: bold; font-size: 16px; color: #444;">Your Ticket 🎫</span>
-            <button onclick="closeModal('ticketModal')" style="background:none; border:none; font-size:22px; cursor:pointer; color:#777;">✕</button>
-        </div>
+    <!-- BOOKMYSHOW STYLE TICKET MODAL -->
+    <div class="modal" id="ticketModal">
+        <div class="modal-body" style="background: #f2f2f2; border-radius: 18px; padding: 20px; max-width: 420px; color: #333;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <span style="font-weight: bold; font-size: 16px; color: #444;">Your Ticket 🎫</span>
+                <button onclick="closeModal('ticketModal')" style="background:none; border:none; font-size:22px; cursor:pointer; color:#777;">✕</button>
+            </div>
 
-        <!-- BookMyShow Ticket Card -->
-        <div style="background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e2e2;">
-            
-            <!-- Ticket Header Info -->
-            <div style="padding: 20px; border-bottom: 1px dashed #ccc; position: relative;">
-                <h3 id="bmsTurfName" style="font-size: 20px; font-weight: 800; color: #111; margin-bottom: 6px;">Turf Name</h3>
-                <p id="bmsLocation" style="font-size: 13px; color: #666; margin-bottom: 8px;">📍 Location</p>
-                <div style="display:inline-block; background:#e8f5e9; color:#2e7d32; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:bold;" id="bmsDateTime">
-                    Sat, 29 Aug | 12:00 PM
+            <div style="background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e2e2;">
+                <div style="padding: 20px; border-bottom: 1px dashed #ccc; position: relative;">
+                    <h3 id="bmsTurfName" style="font-size: 20px; font-weight: 800; color: #111; margin-bottom: 6px;">Turf Name</h3>
+                    <p id="bmsLocation" style="font-size: 13px; color: #666; margin-bottom: 8px;">📍 Location</p>
+                    <div style="display:inline-block; background:#e8f5e9; color:#2e7d32; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:bold;" id="bmsDateTime">
+                        Sat, 29 Aug | 12:00 PM
+                    </div>
+                </div>
+
+                <div style="padding: 20px; text-align: center; background: #fafafa;">
+                    <div style="font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px;">Duration</div>
+                    <div id="bmsHours" style="font-size: 22px; font-weight: 800; color: #222; margin: 4px 0 12px 0;">1 Hour(s)</div>
+                    
+                    <div style="background: #f0f0f0; padding: 10px; border-radius: 8px; display: inline-block; width: 100%;">
+                        <span style="font-size: 12px; color: #666; display: block;">BOOKING ID</span>
+                        <strong id="bmsBookingId" style="font-size: 18px; color: #111; letter-spacing: 1px;">TRF-000000</strong>
+                    </div>
+                </div>
+
+                <div style="position: relative; height: 1px; background: #e0e0e0; margin: 0 10px;">
+                    <div style="position: absolute; left: -20px; top: -10px; width: 20px; height: 20px; background: #f2f2f2; border-radius: 50%;"></div>
+                    <div style="position: absolute; right: -20px; top: -10px; width: 20px; height: 20px; background: #f2f2f2; border-radius: 50%;"></div>
+                </div>
+
+                <div style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
+                    <span style="font-size: 14px; color: #555; font-weight: 600;">Total Amount</span>
+                    <span style="font-size: 20px; font-weight: 800; color: #28a745;">₹<span id="bmsTotalPaid">0</span></span>
                 </div>
             </div>
 
-            <!-- Middle Ticket Details -->
-            <div style="padding: 20px; text-align: center; background: #fafafa;">
-                <div style="font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.5px;">Duration</div>
-                <div id="bmsHours" style="font-size: 22px; font-weight: 800; color: #222; margin: 4px 0 12px 0;">1 Hour(s)</div>
-                
-                <div style="background: #f0f0f0; padding: 10px; border-radius: 8px; display: inline-block; width: 100%;">
-                    <span style="font-size: 12px; color: #666; display: block;">BOOKING ID</span>
-                    <strong id="bmsBookingId" style="font-size: 18px; color: #111; letter-spacing: 1px;">TRF-000000</strong>
-                </div>
-            </div>
-
-            <!-- Side Notch Circles (BookMyShow Cut Effect) -->
-            <div style="position: relative; height: 1px; background: #e0e0e0; margin: 0 10px;">
-                <div style="position: absolute; left: -20px; top: -10px; width: 20px; height: 20px; background: #f2f2f2; border-radius: 50%;"></div>
-                <div style="position: absolute; right: -20px; top: -10px; width: 20px; height: 20px; background: #f2f2f2; border-radius: 50%;"></div>
-            </div>
-
-            <!-- Ticket Footer Price -->
-            <div style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
-                <span style="font-size: 14px; color: #555; font-weight: 600;">Total Amount</span>
-                <span style="font-size: 20px; font-weight: 800; color: #28a745;">₹<span id="bmsTotalPaid">0</span></span>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-green" onclick="downloadPDFInvoice()" style="flex:1;">📥 Download PDF</button>
+                <button class="btn btn-blue" onclick="closeModal('ticketModal')" style="flex:1;">Done</button>
             </div>
         </div>
-
-        <!-- Action Buttons -->
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn btn-green" onclick="downloadPDFInvoice()" style="flex:1;">📥 Download PDF</button>
-            <button class="btn btn-blue" onclick="closeModal('ticketModal')" style="flex:1;">Done</button>
-        </div>
-
     </div>
-</div>
 
- <script>
+    <script>
         let selectedDate = new Date().toISOString().split('T')[0];
         let currentPricePerHour = 0;
         let selectedTurfOpenTime = "00:00";
         let selectedTurfCloseTime = "23:59";
         
-        // Active Subscription Tier Management
         let currentTier = "Pro";
         let currentDiscountPercent = 5;
-
-        // Pending Selected Tier for Payment
         let selectedPendingTier = "Pro";
         let selectedPendingDiscount = 5;
         let selectedPendingPrice = 199;
 
+        let selectedDuration = 1; 
         let currentLockTimer = null;
         let lockTimeRemaining = 300;
         let lastBookingData = null;
         let tempBookingDetails = null;
-        
         let currentOwnerGst = "";
 
-        // Memory array to track booked slots and prevent double booking
-        let bookedSlots = [];
-
-        // Complete GST Database
         const gstDatabase = {
             "88990011": { name: "Joel Antony", phone: "9876543210", address: "Food Court Avenue, Thrissur - 680310", businessName: "Green Park Turf" },
-            "11223344": { name: "Muhammed Rafeeq", phone: "9847012345", address: "Central Mall Complex, Thrissur - 680001", businessName: "Arena Sports Complex" },
-            "55667788": { name: "Rahul Varma", phone: "9745123456", address: "Highway Junction, Chalakudy - 680307", businessName: "Kickoff Football Arena" },
-            "99887766": { name: "Vishnu Prasad", phone: "9633890123", address: "Town Center, Irinjalakuda - 680121", businessName: "Champions Turf" },
-            "12345678": { name: "Suresh Babu", phone: "9562781043", address: "Industrial Zone, Ollur - 680306", businessName: "Strikers Turf" },
-            "23456789": { name: "Thomas Antony", phone: "9447812903", address: "Airport Road, Angamaly - 683572", businessName: "Royal Turf Arena" },
-            "34567890": { name: "Fahad K. P.", phone: "9895123467", address: "Beach Road, Kozhikode - 673001", businessName: "Goal Arena" },
-            "45678901": { name: "Akhil Das", phone: "9786123450", address: "Stadium Complex, Palakkad - 678001", businessName: "Turf World" },
-            "56789012": { name: "Sajeev Kumar", phone: "9654123890", address: "Temple Road, Guruvayur - 680507", businessName: "Speedline Sports" },
-            "67890123": { name: "Nikhil Joseph", phone: "9543876123", address: "Metro Station Plaza, Aluva - 683101", businessName: "Red Card Arena" },
-            "78901234": { name: "Vineeth K.", phone: "9432109876", address: "Fort Road, Kannur - 670001", businessName: "Football Hub" },
-            "89012345": { name: "Hari Prasad", phone: "9321098765", address: "KSRTC Station Square, Kottayam - 686001", businessName: "Playground Turf" },
-            "90123456": { name: "Arun Raj", phone: "9210987654", address: "Port City Mall, Kollam - 691001", businessName: "Victory Sports" },
-            "10102020": { name: "Jasim Rahman", phone: "9109876543", address: "Bypass Road, Malappuram - 676505", businessName: "Turf Nation" },
-            "30304040": { name: "Shinoj P.", phone: "9098765432", address: "Railway Station Road, Wadakkanchery - 680582", businessName: "Kick Offen" },
-            "50506060": { name: "Deepak P. R.", phone: "8987654321", address: "University Zone, Mannuthy - 680651", businessName: "Greenfield Arena" },
-            "70708080": { name: "Sachin V.", phone: "8876543210", address: "Central Square, Thiruvananthapuram - 695001", businessName: "Stadium Turf" },
-            "11112222": { name: "Binu Varghese", phone: "8765432109", address: "Riverview Drive, Muvattupuzha - 686661", businessName: "All Star Turf" },
-            "33334444": { name: "Praseed K. P.", phone: "8654321098", address: "Junction Square, Shornur - 679121", businessName: "United Arena" },
-            "55556666": { name: "Ashiq M.", phone: "8543210987", address: "Harbor Road, Ponnani - 679577", businessName: "Sevens Turf" },
-            "77778888": { name: "Sreejith R.", phone: "8432109876", address: "Bypass Junction, Chengannur - 689121", businessName: "Powerplay Arena" },
-            "99990000": { name: "Melvin Mathew", phone: "8321098765", address: "College Road, Tiruvalla - 689101", businessName: "Match Point" },
-            "12123434": { name: "Vivek Raman", phone: "8210987654", address: "Valley View Center, Kalpetta - 673121", businessName: "Hillview Turf" },
-            "56567878": { name: "Mujeeb Rahman", phone: "8109876543", address: "Coastal Highway, Kasaragod - 671121", businessName: "Royal Football Ground" },
-            "90901212": { name: "Sharath Chandran", phone: "8098765432", address: "High Range Plaza, Thodupuzha - 685584", businessName: "Highrange Turf" },
-            "11221122": { name: "Praveen Kumar", phone: "9876123455", address: "Heritage Plaza, Kodungallur - 680664", businessName: "Coastal Arena" },
-            "33443344": { name: "Francis Jose", phone: "9745987654", address: "Seaside Avenue, Chavakkad - 680506", businessName: "Seaside Turf" },
-            "55665566": { name: "Ansar K.", phone: "9633123456", address: "Town Hall Square, Tirur - 676101", businessName: "Turf Kings" },
-            "77887788": { name: "Shaiju N.", phone: "9562123456", address: "Commercial Zone, Kunnamkulam - 680503", businessName: "Arena 9" },
-            "99009900": { name: "Manu Krishnan", phone: "9447123456", address: "Main Street, Cherpu - 680561", businessName: "Sports Planet" }
-        };
+"11223344": { name: "Muhammed Rafeeq", phone: "9847012345", address: "Central Mall Complex, Thrissur - 680001", businessName: "Arena Sports Complex" },
+"55667788": { name: "Rahul Varma", phone: "9745123456", address: "Highway Junction, Chalakudy - 680307", businessName: "Kickoff Football Arena" },
+"99887766": { name: "Vishnu Prasad", phone: "9633890123", address: "Town Center, Irinjalakuda - 680121", businessName: "Champions Turf" },
+"12345678": { name: "Suresh Babu", phone: "9562781043", address: "Industrial Zone, Ollur - 680306", businessName: "Strikers Turf" },
+"23456789": { name: "Thomas Antony", phone: "9447812903", address: "Airport Road, Angamaly - 683572", businessName: "Royal Turf Arena" },
+"34567890": { name: "Fahad K. P.", phone: "9895123467", address: "Beach Road, Kozhikode - 673001", businessName: "Goal Arena" },
+"45678901": { name: "Akhil Das", phone: "9786123450", address: "Stadium Complex, Palakkad - 678001", businessName: "Turf World" },
+"56789012": { name: "Sajeev Kumar", phone: "9654123890", address: "Temple Road, Guruvayur - 680507", businessName: "Speedline Sports" },
+"67890123": { name: "Nikhil Joseph", phone: "9543876123", address: "Metro Station Plaza, Aluva - 683101", businessName: "Red Card Arena" },
+"78901234": { name: "Vineeth K.", phone: "9432109876", address: "Fort Road, Kannur - 670001", businessName: "Football Hub" },
+"89012345": { name: "Hari Prasad", phone: "9321098765", address: "KSRTC Station Square, Kottayam - 686001", businessName: "Playground Turf" },
+"90123456": { name: "Arun Raj", phone: "9210987654", address: "Port City Mall, Kollam - 691001", businessName: "Victory Sports" },
+"10102020": { name: "Jasim Rahman", phone: "9109876543", address: "Bypass Road, Malappuram - 676505", businessName: "Turf Nation" },
+"30304040": { name: "Shinoj P.", phone: "9098765432", address: "Railway Station Road, Wadakkanchery - 680582", businessName: "Kick Offen" },
+"50506060": { name: "Deepak P. R.", phone: "8987654321", address: "University Zone, Mannuthy - 680651", businessName: "Greenfield Arena" },
+"70708080": { name: "Sachin V.", phone: "8876543210", address: "Central Square, Thiruvananthapuram - 695001", businessName: "Stadium Turf" },
+"11112222": { name: "Binu Varghese", phone: "8765432109", address: "Riverview Drive, Muvattupuzha - 686661", businessName: "All Star Turf" },
+"33334444": { name: "Praseed K. P.", phone: "8654321098", address: "Junction Square, Shornur - 679121", businessName: "United Arena" },
+"55556666": { name: "Ashiq M.", phone: "8543210987", address: "Harbor Road, Ponnani - 679577", businessName: "Sevens Turf" },
+"77778888": { name: "Sreejith R.", phone: "8432109876", address: "Bypass Junction, Chengannur - 689121", businessName: "Powerplay Arena" },
+"99990000": { name: "Melvin Mathew", phone: "8321098765", address: "College Road, Tiruvalla - 689101", businessName: "Match Point" },
+"12123434": { name: "Vivek Raman", phone: "8210987654", address: "Valley View Center, Kalpetta - 673121", businessName: "Hillview Turf" },
+"56567878": { name: "Mujeeb Rahman", phone: "8109876543", address: "Coastal Highway, Kasaragod - 671121", businessName: "Royal Football Ground" },
+"90901212": { name: "Sharath Chandran", phone: "8098765432", address: "High Range Plaza, Thodupuzha - 685584", businessName: "Highrange Turf" },
+"11221122": { name: "Praveen Kumar", phone: "9876123455", address: "Heritage Plaza, Kodungallur - 680664", businessName: "Coastal Arena" },
+"33443344": { name: "Francis Jose", phone: "9745987654", address: "Seaside Avenue, Chavakkad - 680506", businessName: "Seaside Turf" },
+"55665566": { name: "Ansar K.", phone: "9633123456", address: "Town Hall Square, Tirur - 676101", businessName: "Turf Kings" },
+"77887788": { name: "Shaiju N.", phone: "9562123456", address: "Commercial Zone, Kunnamkulam - 680503", businessName: "Arena 9" },
+"99009900": { name: "Manu Krishnan", phone: "9447123456", address: "Main Street, Cherpu - 680561", businessName: "Sports Planet" }
+};
 
-        // Turf List Memory
-        let turfsList = [
+        let defaultTurfs = [
             { id: 1, gst: "88990011", name: "Green Park Turf", ownerName: "Anax M. L.", phone: "9876543210", location: "Food Court Avenue, Thrissur - 680310", price: 1000, openTime: "05:00", closeTime: "23:00", imageUrl: "/images/turf1.jpg", approved: true },
             { id: 2, gst: "12345678", name: "Strikers Turf", ownerName: "Suresh Babu", phone: "9562781043", location: "Industrial Zone, Ollur - 680306", price: 1200, openTime: "06:00", closeTime: "22:00", imageUrl: "/images/turf1.jpg", approved: true }
         ];
 
-        // 1. FIXED LOGIN & FORM SUBMIT HANDLER
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.querySelector('form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-        });
+        // Load data from LocalStorage to ensure Persistence
+        let turfsList = JSON.parse(localStorage.getItem('turfsList')) || defaultTurfs;
+        let bookedSlots = JSON.parse(localStorage.getItem('bookedSlots')) || [];
+
+        function saveStateToStorage() {
+            localStorage.setItem('turfsList', JSON.stringify(turfsList));
+            localStorage.setItem('bookedSlots', JSON.stringify(bookedSlots));
+        }
 
         function handleLogin(e) {
             if (e && e.preventDefault) e.preventDefault();
-            
-            const uInput = document.getElementById('username');
-            const pInput = document.getElementById('password');
-
-            const u = uInput ? uInput.value.trim() : '';
-            const p = pInput ? pInput.value.trim() : '';
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
 
             if (u === 'admin' && p === '1234') {
                 openRolePage();
@@ -627,17 +590,13 @@
 
         function confirmSubscriptionPayment() {
             const selectedMethod = document.querySelector('input[name="payMethod"]:checked').value;
-            
             currentTier = selectedPendingTier;
             currentDiscountPercent = selectedPendingDiscount;
             updateSubscriptionUI();
 
             closeModal('paymentGatewayModal');
-            alert(`🎉 Payment Successful via ${selectedMethod}!\n\nYour ${currentTier} Membership Plan is now Active with ${currentDiscountPercent}% OFF on all bookings!`);
-            
-            if (typeof confetti === 'function') {
-                confetti({ particleCount: 100, spread: 60, origin: { y: 0.5 } });
-            }
+            alert(`🎉 Payment Successful via ${selectedMethod}!\n\nYour ${currentTier} Plan is Active with ${currentDiscountPercent}% OFF!`);
+            if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 60, origin: { y: 0.5 } });
         }
 
         function updateSubscriptionUI() {
@@ -653,15 +612,13 @@
         function verifyOwnerGST() {
             const gst = document.getElementById('ownerGstInput').value.trim();
             if (gstDatabase[gst]) {
-                const ownerDetails = gstDatabase[gst];
                 currentOwnerGst = gst;
-                alert(`✅ License Verified!\n\nOwner: ${ownerDetails.name}\nPhone: ${ownerDetails.phone}\nAddress: ${ownerDetails.address}\nBusiness: ${ownerDetails.businessName}`);
                 closeModal('ownerAuthModal');
                 document.getElementById('activeOwnerGst').innerText = gst;
                 showPage('owner-page');
                 loadOwnerTurfs();
             } else {
-                alert("❌ Invalid GST/License Number! Try e.g. 12345678 or 88990011.");
+                alert("❌ Invalid GST/License Number! Try 12345678 or 88990011.");
             }
         }
 
@@ -671,99 +628,9 @@
             loadUserTurfs();
         }
 
-        function openAddTurfModal(turfId = null) {
-            const ownerInfo = gstDatabase[currentOwnerGst] || {};
-            const existingTurf = turfsList.find(t => t.id === turfId) || turfsList.find(t => t.gst === currentOwnerGst);
-
-            document.getElementById('newTurfGst').value = currentOwnerGst;
-            document.getElementById('newOwnerName').value = ownerInfo.name || '';
-            document.getElementById('newTurfLocation').value = ownerInfo.address || '';
-
-            if (existingTurf) {
-                document.getElementById('newTurfName').value = existingTurf.name;
-                document.getElementById('newOwnerPhone').value = existingTurf.phone;
-                document.getElementById('newTurfPrice').value = existingTurf.price;
-                document.getElementById('newOpenTime').value = existingTurf.openTime;
-                document.getElementById('newCloseTime').value = existingTurf.closeTime;
-            } else {
-                document.getElementById('newTurfName').value = ownerInfo.businessName || '';
-                document.getElementById('newOwnerPhone').value = ownerInfo.phone || '';
-                document.getElementById('newTurfPrice').value = '';
-                document.getElementById('newOpenTime').value = '05:00';
-                document.getElementById('newCloseTime').value = '23:00';
-            }
-
-            document.getElementById('newTurfFile').value = '';
-            document.getElementById('addTurfModal').style.display = 'flex';
-        }
-
-        function saveTurf(e) {
-            if (e) e.preventDefault();
-            const fileInput = document.getElementById('newTurfFile');
-
-            const processTurfSave = (imgData) => {
-                const existingIndex = turfsList.findIndex(t => t.gst === currentOwnerGst);
-
-                const turfData = {
-                    id: existingIndex !== -1 ? turfsList[existingIndex].id : Date.now(),
-                    gst: currentOwnerGst,
-                    ownerName: document.getElementById('newOwnerName').value,
-                    location: document.getElementById('newTurfLocation').value,
-                    name: document.getElementById('newTurfName').value,
-                    phone: document.getElementById('newOwnerPhone').value,
-                    price: parseFloat(document.getElementById('newTurfPrice').value),
-                    openTime: document.getElementById('newOpenTime').value,
-                    closeTime: document.getElementById('newCloseTime').value,
-                    imageUrl: imgData || (existingIndex !== -1 ? turfsList[existingIndex].imageUrl : '/images/turf1.jpg'),
-                    approved: true
-                };
-
-                if (existingIndex !== -1) {
-                    turfsList[existingIndex] = turfData;
-                    alert("✅ Details Updated Successfully!");
-                } else {
-                    turfsList.push(turfData);
-                    alert("✅ Turf Created and Saved Successfully!");
-                }
-
-                closeModal('addTurfModal');
-                loadOwnerTurfs();
-            };
-
-            if (fileInput && fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(evt) { processTurfSave(evt.target.result); };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                processTurfSave(null);
-            }
-        }
-
         function loadOwnerTurfs() {
             const container = document.getElementById('ownerTurfContainer');
             const ownerTurfs = turfsList.filter(t => t.gst === currentOwnerGst);
-
-            if (ownerTurfs.length === 0) {
-                const dbInfo = gstDatabase[currentOwnerGst];
-                if (dbInfo) {
-                    const newDefaultTurf = {
-                        id: Date.now(),
-                        gst: currentOwnerGst,
-                        ownerName: dbInfo.name,
-                        location: dbInfo.address,
-                        name: dbInfo.businessName,
-                        phone: dbInfo.phone,
-                        price: 1000,
-                        openTime: "05:00",
-                        closeTime: "23:00",
-                        imageUrl: "/images/turf1.jpg",
-                        approved: true
-                    };
-                    turfsList.push(newDefaultTurf);
-                    loadOwnerTurfs();
-                    return;
-                }
-            }
 
             container.innerHTML = ownerTurfs.map(t => `
                 <div class="turf-card">
@@ -775,22 +642,48 @@
                         <p>📞 <strong>Phone:</strong> ${t.phone}</p>
                         <p style="font-size:13px; color:#666;">🕒 Hours: ${t.openTime} - ${t.closeTime}</p>
                         <p class="price-text">₹${t.price} / hour</p>
-                        <button class="btn btn-blue" onclick="openAddTurfModal(${t.id})">✏️ Edit Turf / Phone / Image</button>
+                        <button class="btn btn-blue" onclick="openAddTurfModal(${t.id})">✏️ Edit Turf</button>
                     </div>
                 </div>
             `).join('');
         }
 
+        function openAddTurfModal(turfId) {
+            const turf = turfsList.find(t => t.id === turfId);
+            if (!turf) return;
+
+            document.getElementById('newTurfGst').value = turf.gst;
+            document.getElementById('newOwnerName').value = turf.ownerName;
+            document.getElementById('newTurfLocation').value = turf.location;
+            document.getElementById('newTurfName').value = turf.name;
+            document.getElementById('newOwnerPhone').value = turf.phone;
+            document.getElementById('newTurfPrice').value = turf.price;
+            document.getElementById('newOpenTime').value = turf.openTime;
+            document.getElementById('newCloseTime').value = turf.closeTime;
+
+            document.getElementById('addTurfModal').style.display = 'flex';
+        }
+
+        function saveTurf(e) {
+            if (e) e.preventDefault();
+            const index = turfsList.findIndex(t => t.gst === currentOwnerGst);
+            if (index !== -1) {
+                turfsList[index].name = document.getElementById('newTurfName').value;
+                turfsList[index].phone = document.getElementById('newOwnerPhone').value;
+                turfsList[index].price = parseFloat(document.getElementById('newTurfPrice').value);
+                turfsList[index].openTime = document.getElementById('newOpenTime').value;
+                turfsList[index].closeTime = document.getElementById('newCloseTime').value;
+
+                saveStateToStorage();
+                alert("✅ Turf Details Updated Successfully!");
+                closeModal('addTurfModal');
+                loadOwnerTurfs();
+            }
+        }
+
         function loadUserTurfs() {
             const container = document.getElementById('userTurfContainer');
-            const approvedTurfs = turfsList.filter(t => t.approved);
-
-            if (approvedTurfs.length === 0) {
-                container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No turfs available for booking yet.</p>';
-                return;
-            }
-
-            container.innerHTML = approvedTurfs.map(t => `
+            container.innerHTML = turfsList.map(t => `
                 <div class="turf-card">
                     <img src="${t.imageUrl}" onerror="this.src='/images/turf1.jpg'">
                     <div class="turf-info">
@@ -799,7 +692,7 @@
                         <p>📞 Contact: ${t.phone}</p>
                         <p style="font-size:13px; color:#666;">🕒 Hours: ${t.openTime} - ${t.closeTime}</p>
                         <p class="price-text">₹${t.price} / hour</p>
-                        <button class="btn btn-green" onclick="initiateBooking(${t.id}, '${t.name}', ${t.price}, '${t.openTime}', '${t.closeTime}')" style="margin-top:10px;">Book Now</button>
+                        <button class="btn btn-green" onclick="initiateBooking(${t.id}, '${t.name}', ${t.price}, '${t.openTime}', '${t.closeTime}')">Book Now</button>
                     </div>
                 </div>
             `).join('');
@@ -819,6 +712,7 @@
                     document.querySelectorAll('.date-card').forEach(el => el.classList.remove('selected'));
                     card.classList.add('selected');
                     selectedDate = dateStr;
+                    generateInteractiveGrid();
                 };
                 container.appendChild(card);
             }
@@ -828,112 +722,148 @@
             document.getElementById('bookTurfId').value = id;
             document.getElementById('bookTurfName').innerText = name;
             currentPricePerHour = price;
-            selectedTurfOpenTime = openT || "00:00";
-            selectedTurfCloseTime = closeT || "23:59";
+            selectedTurfOpenTime = openT;
+            selectedTurfCloseTime = closeT;
+            selectedDuration = 1;
 
-            generateInteractiveGrid(selectedTurfOpenTime, selectedTurfCloseTime);
+            generateInteractiveGrid();
             startSlotLockTimer();
-            recalculatePrice();
             document.getElementById('bookingModal').style.display = 'flex';
         }
 
-        function generateInteractiveGrid(openT, closeT) {
+        
+
+        function generateInteractiveGrid() {
             const gridContainer = document.getElementById('interactiveSlotGrid');
             gridContainer.innerHTML = '';
-            let [openH] = openT.split(':').map(Number);
-            let [closeH] = closeT.split(':').map(Number);
-
+            let openH = parseInt(selectedTurfOpenTime.split(':')[0], 10);
+            let closeH = parseInt(selectedTurfCloseTime.split(':')[0], 10);
             const currentTurfId = parseInt(document.getElementById('bookTurfId').value, 10);
-            let firstAvailableSelected = false;
+
+            let selectedAny = false;
 
             for (let h = openH; h < closeH; h++) {
                 let timeStr = (h < 10 ? '0' + h : h) + ':00';
                 let btn = document.createElement('div');
-                
-                let isAlreadyBooked = bookedSlots.some(slot => 
-                    slot.turfId === currentTurfId && 
-                    slot.date === selectedDate && 
-                    slot.time === timeStr
-                );
 
-                if (isAlreadyBooked) {
+                let isBooked = bookedSlots.some(s => s.turfId === currentTurfId && s.date === selectedDate && s.time === timeStr);
+
+                if (isBooked) {
                     btn.className = 'slot-btn disabled';
                     btn.innerText = timeStr + ' (Booked)';
-                    btn.onclick = function() {
-                        alert('❌ This time slot is already booked! Please select another slot.');
-                    };
                 } else {
-                    let isSelected = !firstAvailableSelected;
+                    let isSelected = !selectedAny;
                     if (isSelected) {
-                        firstAvailableSelected = true;
+                        selectedAny = true;
                         document.getElementById('slotTime').value = timeStr;
                     }
-
                     btn.className = 'slot-btn' + (isSelected ? ' selected' : '');
                     btn.innerText = timeStr;
-                    btn.onclick = function(e) {
-                        selectSlot(timeStr, h, currentTurfId, e);
-                    };
+                    btn.onclick = () => selectSlot(timeStr, btn);
                 }
                 gridContainer.appendChild(btn);
             }
+            recalculatePrice();
         }
 
-        // 2. FIXED SELECT SLOT (Uses turfsList & Limits Max 3 Hours)
-        function selectSlot(timeString, startHour, turfId, eventObj) {
-            document.querySelectorAll('.slot-btn').forEach(btn => btn.classList.remove('selected'));
-            if (eventObj && eventObj.target) {
-                eventObj.target.classList.add('selected');
-            }
+        // Function to handle slot selection based on duration (1, 2, or 3 Hours)
+function selectSlot(timeStr, btnElem) {
+    const startHour = parseInt(timeStr.split(':')[0], 10);
+    let closeH = parseInt(selectedTurfCloseTime.split(':')[0], 10);
+    const currentTurfId = parseInt(document.getElementById('bookTurfId').value, 10);
 
-            if (!tempBookingDetails) tempBookingDetails = {};
-            tempBookingDetails.slotTime = timeString;
-            tempBookingDetails.startHour = startHour;
-            tempBookingDetails.turfId = turfId;
+    // 1. Prevent selection if duration exceeds the turf's closing time
+    if (startHour + selectedDuration > closeH) {
+        alert(`Cannot book ${selectedDuration} hours starting from ${timeStr}. Turf closes at ${selectedTurfCloseTime}.`);
+        return;
+    }
 
-            const slotInput = document.getElementById('slotTime');
-            if (slotInput) slotInput.value = timeString;
+    // 2. Check if any consecutive slots in the selected duration are already booked
+    for (let i = 0; i < selectedDuration; i++) {
+        let checkHour = startHour + i;
+        let checkTimeStr = (checkHour < 10 ? '0' + checkHour : checkHour) + ':00';
+        let isAlreadyBooked = bookedSlots.some(s => s.turfId === currentTurfId && s.date === selectedDate && s.time === checkTimeStr);
 
-            const durationInput = document.getElementById('playHours') || document.getElementById('playDurationInput');
-            if (!durationInput) return;
+        if (isAlreadyBooked) {
+            alert(`⚠️ Consecutive slot error: ${checkTimeStr} is already booked! Please select another start time.`);
+            return;
+        }
+    }
 
-            // Corrected Array Reference: turfsList
-            const currentTurf = turfsList.find(t => t.id === turfId) || { closeTime: "23:00" };
-            let closeH = parseInt(currentTurf.closeTime.split(':')[0], 10);
+    // 3. Clear previous green highlights from all available slot buttons
+    document.querySelectorAll('.slot-btn').forEach(b => {
+        if (!b.classList.contains('disabled')) {
+            b.classList.remove('selected');
+        }
+    });
 
-            // Set maximum allowed duration limit to 3 hours
-            const maxAllowedBySystem = 3; 
-            let maxHours = Math.min(maxAllowedBySystem, closeH - startHour);
-            if (maxHours < 1) maxHours = 1;
+    // 4. Highlight consecutive slot buttons based on selected duration
+    const allButtons = Array.from(document.querySelectorAll('.slot-btn'));
 
-            if (durationInput.tagName === 'SELECT') {
-                durationInput.innerHTML = '';
-                for (let i = 1; i <= maxHours; i++) {
-                    let opt = document.createElement('option');
-                    opt.value = i;
-                    opt.innerText = i + ' Hour(s)';
-                    durationInput.appendChild(opt);
-                }
-            } else {
-                durationInput.max = maxHours;
-                durationInput.value = 1;
-            }
+    for (let i = 0; i < selectedDuration; i++) {
+        let targetHour = startHour + i;
+        let targetTimeStr = (targetHour < 10 ? '0' + targetHour : targetHour) + ':00';
 
-            tempBookingDetails.playHours = 1;
-            recalculatePrice();
+        // Find the button corresponding to the target hour and add 'selected' class
+        let targetBtn = allButtons.find(b => b.innerText.startsWith(targetTimeStr));
+        if (targetBtn) {
+            targetBtn.classList.add('selected');
+        }
+    }
+
+    // Update hidden input value with starting slot time
+    document.getElementById('slotTime').value = timeStr;
+    
+    // Recalculate total dynamic price
+    recalculatePrice();
+}
+
+// Function to update highlights when changing duration (1 Hr, 2 Hrs, 3 Hrs)
+function setDuration(hours, btnElem) {
+    selectedDuration = hours;
+    
+    // Update active style on duration buttons
+    document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+    if(btnElem) btnElem.classList.add('active');
+    
+    // Re-apply slot selection using current starting time
+    const currentStartSlot = document.getElementById('slotTime').value || "05:00";
+    const allButtons = Array.from(document.querySelectorAll('.slot-btn'));
+    const currentBtn = allButtons.find(b => b.innerText.startsWith(currentStartSlot));
+
+    if (currentBtn) {
+        selectSlot(currentStartSlot, currentBtn);
+    } else {
+        generateInteractiveGrid();
+    }
+}
+        function recalculatePrice() {
+            const slotInput = document.getElementById('slotTime').value || "05:00";
+            const startHour = parseInt(slotInput.split(':')[0], 10);
+
+            let isPeak = (startHour >= 18 && startHour <= 22);
+            let dynamicMultiplier = isPeak ? 1.2 : 1.0;
+
+            let baseTotal = selectedDuration * currentPricePerHour * dynamicMultiplier;
+            let discountAmount = (baseTotal * currentDiscountPercent) / 100;
+            let finalPrice = baseTotal - discountAmount;
+
+            document.getElementById('baseRateTxt').innerText = currentPricePerHour;
+            document.getElementById('dynamicRateInfo').innerText = isPeak ? "Peak Hours Rate: +20% applied" : "Peak Hours Rate: Standard";
+            document.getElementById('rewardDiscountInfo').innerText = `⭐ ${currentTier} Discount: ${currentDiscountPercent}% OFF (-₹${discountAmount.toFixed(0)})`;
+            document.getElementById('totalCalcPrice').innerText = finalPrice.toFixed(0);
         }
 
         function startSlotLockTimer() {
             clearInterval(currentLockTimer);
-            lockTimeRemaining = 300; 
+            lockTimeRemaining = 300;
             document.getElementById('lockTimerBanner').style.display = 'block';
 
             currentLockTimer = setInterval(() => {
                 lockTimeRemaining--;
                 let mins = Math.floor(lockTimeRemaining / 60);
                 let secs = lockTimeRemaining % 60;
-                document.getElementById('lockCountdown').innerText = 
-                    (mins < 10 ? '0' + mins : mins) + ':' + (secs < 10 ? '0' + secs : secs);
+                document.getElementById('lockCountdown').innerText = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
 
                 if (lockTimeRemaining <= 0) {
                     clearInterval(currentLockTimer);
@@ -948,75 +878,16 @@
             closeModal('bookingModal');
         }
 
-        // 3. FIXED RECALCULATE PRICE (Auto Restricts inputs > 3)
-        function recalculatePrice() {
-            const durationInput = document.getElementById('playHours') || document.getElementById('playDurationInput');
-            let hrs = parseInt(durationInput ? durationInput.value : 1, 10) || 1;
-            
-            const maxLimit = durationInput && durationInput.max ? parseInt(durationInput.max, 10) : 3;
-            if (hrs > maxLimit) {
-                alert(`⚠️ Maximum allowed duration for this slot is ${maxLimit} hour(s)!`);
-                hrs = maxLimit;
-                if (durationInput) durationInput.value = maxLimit;
-            }
-
-            const slotInput = document.getElementById('slotTime');
-            const timeVal = slotInput ? slotInput.value : "18:00";
-            const [startHour] = timeVal.split(':').map(Number);
-
-            let dynamicMultiplier = (startHour >= 18 && startHour <= 22) ? 1.2 : 1.0;
-            let baseTotal = hrs * currentPricePerHour * dynamicMultiplier;
-
-            let discountAmount = (baseTotal * currentDiscountPercent) / 100;
-            let finalPrice = baseTotal - discountAmount;
-
-            if (document.getElementById('baseRateTxt')) document.getElementById('baseRateTxt').innerText = currentPricePerHour;
-            if (document.getElementById('dynamicRateInfo')) {
-                document.getElementById('dynamicRateInfo').innerText = 
-                    dynamicMultiplier > 1 ? "Peak Hours Rate: +20% applied" : "Peak Hours Rate: Standard";
-            }
-            if (document.getElementById('rewardDiscountInfo')) {
-                document.getElementById('rewardDiscountInfo').innerText = 
-                    `⭐ ${currentTier} Discount: ${currentDiscountPercent}% OFF applied (-₹${discountAmount.toFixed(0)})`;
-            }
-            if (document.getElementById('totalCalcPrice')) {
-                document.getElementById('totalCalcPrice').innerText = finalPrice.toFixed(0);
-            }
-        }
-
         function openBookingPaymentGateway(e) {
-            if (e && e.preventDefault) e.preventDefault();
-            
+            if (e) e.preventDefault();
             const turfId = parseInt(document.getElementById('bookTurfId').value, 10);
             const slotTime = document.getElementById('slotTime').value;
-            const durationInput = document.getElementById('playHours') || document.getElementById('playDurationInput');
-            const playHours = parseInt(durationInput ? durationInput.value : 1, 10);
+            const startH = parseInt(slotTime.split(':')[0], 10);
 
-            if (!slotTime) {
-                alert("Please select an available time slot!");
-                return;
-            }
-
-            if (playHours > 3) {
-                alert("❌ Maximum booking duration is 3 hours!");
-                return;
-            }
-
-            // Check Overlapping slots for multi-hour booking
-            const [startH] = slotTime.split(':').map(Number);
-            for (let h = 0; h < playHours; h++) {
-                let checkH = startH + h;
-                let checkTimeStr = (checkH < 10 ? '0' + checkH : checkH) + ':00';
-
-                let isBooked = bookedSlots.some(slot => 
-                    slot.turfId === turfId && 
-                    slot.date === selectedDate && 
-                    slot.time === checkTimeStr
-                );
-
-                if (isBooked) {
-                    alert(`❌ Slot ${checkTimeStr} is already booked! Please choose another slot.`);
-                    generateInteractiveGrid(selectedTurfOpenTime, selectedTurfCloseTime);
+            for (let h = 0; h < selectedDuration; h++) {
+                let checkTime = ((startH + h) < 10 ? '0' : '') + (startH + h) + ':00';
+                if (bookedSlots.some(s => s.turfId === turfId && s.date === selectedDate && s.time === checkTime)) {
+                    alert(`❌ Slot ${checkTime} is already booked!`);
                     return;
                 }
             }
@@ -1026,7 +897,7 @@
                 turfName: document.getElementById('bookTurfName').innerText,
                 custName: document.getElementById('custName').value,
                 custPhone: document.getElementById('custPhone').value,
-                playHours: playHours,
+                playHours: selectedDuration,
                 slotTime: slotTime,
                 totalPrice: document.getElementById('totalCalcPrice').innerText,
                 bookingRef: 'TRF-' + Math.floor(100000 + Math.random() * 900000)
@@ -1040,228 +911,96 @@
         }
 
         function confirmFinalBookingAndPay() {
-            const selectedMethodElement = document.querySelector('input[name="turfPayMethod"]:checked');
-            const selectedMethod = selectedMethodElement ? selectedMethodElement.value : 'UPI';
-            
-            if (currentLockTimer) {
-                clearInterval(currentLockTimer);
-            }
+    clearInterval(currentLockTimer);
+    const startH = parseInt(tempBookingDetails.slotTime.split(':')[0], 10);
 
-            bookedSlots.push({
-                turfId: tempBookingDetails.turfId,
-                date: selectedDate,
-                time: tempBookingDetails.slotTime
+    for (let h = 0; h < tempBookingDetails.playHours; h++) {
+        let timeStr = ((startH + h) < 10 ? '0' : '') + (startH + h) + ':00';
+        bookedSlots.push({ turfId: tempBookingDetails.turfId, date: selectedDate, time: timeStr });
+    }
+
+    saveStateToStorage();
+    lastBookingData = { ...tempBookingDetails, selectedDate, currentTier, currentDiscountPercent };
+
+    document.getElementById('bmsTurfName').innerText = lastBookingData.turfName;
+    document.getElementById('bmsLocation').innerText = `📍 Start Slot: ${lastBookingData.slotTime}`;
+    document.getElementById('bmsDateTime').innerText = `📅 ${selectedDate} | ${lastBookingData.slotTime}`;
+    document.getElementById('bmsHours').innerText = `${lastBookingData.playHours} Hour(s)`;
+    document.getElementById('bmsBookingId').innerText = lastBookingData.bookingRef;
+    document.getElementById('bmsTotalPaid').innerText = lastBookingData.totalPrice;
+
+    closeModal('turfPaymentModal');
+    document.getElementById('ticketModal').style.display = 'flex';
+
+    
+    triggerFrontConfetti();
+}
+
+function triggerFrontConfetti() {
+    
+    let confettiCanvas = document.getElementById('customConfettiCanvas');
+    if (!confettiCanvas) {
+        confettiCanvas = document.createElement('canvas');
+        confettiCanvas.id = 'customConfettiCanvas';
+        confettiCanvas.style.position = 'fixed';
+        confettiCanvas.style.top = '0';
+        confettiCanvas.style.left = '0';
+        confettiCanvas.style.width = '100vw';
+        confettiCanvas.style.height = '100vh';
+        confettiCanvas.style.pointerEvents = 'none'; // ക്ലിക്ക് തടയാതിരിക്കാൻ
+        confettiCanvas.style.zIndex = '99999'; // ടിക്കറ്റിന് മുകളിൽ വരാൻ ഉയർന്ന z-index
+        document.body.appendChild(confettiCanvas);
+    }
+
+    if (typeof confetti === 'function') {
+        const myConfetti = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+
+        
+        myConfetti({
+            particleCount: 120,
+            spread: 100,
+            origin: { y: 0 },
+            startVelocity: 30
+        });
+
+        
+        setTimeout(() => {
+            myConfetti({
+                particleCount: 80,
+                angle: 60,
+                spread: 70,
+                origin: { x: 0, y: 0.6 }
             });
-
-            lastBookingData = { 
-                ...tempBookingDetails, 
-                selectedDate: selectedDate, 
-                currentTier: typeof currentTier !== 'undefined' ? currentTier : '', 
-                currentDiscountPercent: typeof currentDiscountPercent !== 'undefined' ? currentDiscountPercent : 0 
-            };
-
-            document.getElementById('bmsTurfName').innerText = lastBookingData.turfName || "Turf Booking";
-            document.getElementById('bmsLocation').innerText = `📍 Slot: ${lastBookingData.slotTime}`;
-            document.getElementById('bmsDateTime').innerText = `📅 ${selectedDate} | ${lastBookingData.slotTime}`;
-            document.getElementById('bmsHours').innerText = `${lastBookingData.playHours || 1} Hour(s) Slot`;
-            document.getElementById('bmsBookingId').innerText = lastBookingData.bookingRef || "TRF-SUCCESS";
-            document.getElementById('bmsTotalPaid').innerText = lastBookingData.totalPrice || "0";
-
-            closeModal('turfPaymentModal');
-            document.getElementById('ticketModal').style.display = 'flex';
-
-            if (typeof confetti === 'function') {
-                var myCanvas = document.createElement('canvas');
-                myCanvas.style.position = 'fixed';
-                myCanvas.style.top = '0';
-                myCanvas.style.left = '0';
-                myCanvas.style.width = '100vw';
-                myCanvas.style.height = '100vh';
-                myCanvas.style.zIndex = '99999';
-                myCanvas.style.pointerEvents = 'none';
-                document.body.appendChild(myCanvas);
-
-                var myConfetti = confetti.create(myCanvas, {
-                    resize: true,
-                    useWorker: true
-                });
-
-                myConfetti({
-                    particleCount: 250,
-                    spread: 120,
-                    origin: { x: 0.5, y: 0.3 },
-                    startVelocity: 55,
-                    gravity: 0.7,
-                    ticks: 350,
-                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ff9900']
-                });
-
-                setTimeout(() => {
-                    myConfetti({ particleCount: 150, angle: 60, spread: 100, origin: { x: 0, y: 0.6 } });
-                    myConfetti({ particleCount: 150, angle: 120, spread: 100, origin: { x: 1, y: 0.6 } });
-                }, 150);
-
-                setTimeout(() => { myCanvas.remove(); }, 4000);
-            }
-        }
+            myConfetti({
+                particleCount: 80,
+                angle: 120,
+                spread: 70,
+                origin: { x: 1, y: 0.6 }
+            });
+        }, 200);
+    }
+}
 
         function downloadPDFInvoice() {
             if (!lastBookingData) return;
-
             const element = document.createElement('div');
-            element.style.padding = '30px';
-            element.style.fontFamily = 'Arial, sans-serif';
-            element.style.color = '#333';
-
+            element.style.padding = '20px';
             element.innerHTML = `
-                <div style="border: 2px solid #28a745; padding: 25px; border-radius: 12px; background: #fff;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #28a745; padding-bottom: 15px; margin-bottom: 20px;">
-                        <div>
-                            <h1 style="color: #28a745; margin: 0; font-size: 24px;">TURF BOOKING INVOICE</h1>
-                            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Official Payment Receipt</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <h3 style="margin: 0; color: #333;">${lastBookingData.turfName}</h3>
-                            <p style="margin: 3px 0 0 0; color: #777; font-size: 12px;">Ref: ${lastBookingData.bookingRef}</p>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px; font-size: 14px;">
-                        <p style="margin: 6px 0;"><strong>Customer Name:</strong> ${lastBookingData.custName}</p>
-                        <p style="margin: 6px 0;"><strong>Phone Number:</strong> ${lastBookingData.custPhone}</p>
-                        <p style="margin: 6px 0;"><strong>Booking Date:</strong> ${lastBookingData.selectedDate}</p>
-                        <p style="margin: 6px 0;"><strong>Slot Time:</strong> ${lastBookingData.slotTime}</p>
-                        <p style="margin: 6px 0;"><strong>Duration:</strong> ${lastBookingData.playHours} hour(s)</p>
-                        <p style="margin: 6px 0;"><strong>Applied Plan:</strong> ${lastBookingData.currentTier} Plan (${lastBookingData.currentDiscountPercent}% Discount)</p>
-                    </div>
-
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                        <thead>
-                            <tr style="background: #28a745; color: #fff; text-align: left;">
-                                <th style="padding: 10px; border: 1px solid #28a745;">Description</th>
-                                <th style="padding: 10px; border: 1px solid #28a745; text-align: right;">Amount (₹)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="padding: 10px; border: 1px solid #ddd;">Turf Slot Rental Fee (${lastBookingData.playHours} hr)</td>
-                                <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">₹${lastBookingData.totalPrice}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div style="margin-top: 25px; text-align: right; border-top: 2px solid #28a745; padding-top: 15px;">
-                        <h2 style="color: #28a745; margin: 0; font-size: 22px;">Total Paid: ₹${lastBookingData.totalPrice}</h2>
-                        <p style="margin: 5px 0 0 0; color: #28a745; font-weight: bold; font-size: 12px;">Status: PAID ✅</p>
-                    </div>
-
-                    <div style="margin-top: 30px; text-align: center; color: #888; font-size: 12px; border-top: 1px dashed #ccc; padding-top: 10px;">
-                        Thank you for booking with us! Please present this invoice at the turf entrance.
-                    </div>
-                </div>
+                <h2 style="color:#28a745;">TURF BOOKING INVOICE</h2>
+                <p><strong>Turf:</strong> ${lastBookingData.turfName}</p>
+                <p><strong>Ref ID:</strong> ${lastBookingData.bookingRef}</p>
+                <p><strong>Name:</strong> ${lastBookingData.custName}</p>
+                <p><strong>Date:</strong> ${lastBookingData.selectedDate}</p>
+                <p><strong>Time:</strong> ${lastBookingData.slotTime} (${lastBookingData.playHours} hrs)</p>
+                <h3>Total Paid: ₹${lastBookingData.totalPrice}</h3>
             `;
-
-            const opt = {
-                margin:       10,
-                filename:     `Turf_Invoice_${lastBookingData.bookingRef}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            if (typeof html2pdf === 'function') {
-                html2pdf().set(opt).from(element).save();
-            } else {
-                alert("PDF Download library (html2pdf) load ആയിട്ടില്ല!");
-            }
+            html2pdf().set({ margin: 10, filename: `Invoice_${lastBookingData.bookingRef}.pdf` }).from(element).save();
         }
 
         function closeModal(id) {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         }
-        // Global variable to store selected duration (Default 1 hour)
-let selectedDuration = 1;
-let currentTurfOpenHour = 6;  // Default fallback start hour
-let currentTurfCloseHour = 23; // Default fallback end hour
-
-/**
- * Handles the selection of duration (1, 2, or 3 hours)
- * @param {number} hours - The duration in hours
- * @param {HTMLElement} element - The clicked button element
- */
-function setDuration(hours, element) {
-    selectedDuration = hours;
-
-    // Update button active UI state
-    document.querySelectorAll('.duration-btn').forEach(btn => {
-        btn.classList.remove('active', 'btn-success');
-        btn.classList.add('btn-outline-success');
-    });
-    element.classList.add('active', 'btn-success');
-    element.classList.remove('btn-outline-success');
-
-    // Reset previous slot selection when duration changes
-    clearSelectedSlots();
-}
-
-/**
- * Generates available time slots based on Turf Opening and Closing hours only
- * @param {string} openTime - e.g. "06:00"
- * @param {string} closeTime - e.g. "22:00"
- */
-function renderTurfSlots(openTime, closeTime) {
-    const slotContainer = document.getElementById('slotContainer'); // Update container ID if needed
-    slotContainer.innerHTML = '';
-
-    // Parse hours from "HH:MM" format
-    currentTurfOpenHour = parseInt(openTime.split(':')[0], 10);
-    currentTurfCloseHour = parseInt(closeTime.split(':')[0], 10);
-
-    // Render slots strictly within opening and closing hours
-    for (let hour = currentTurfOpenHour; hour < currentTurfCloseHour; hour++) {
-        const timeFormatted = (hour < 10 ? '0' : '') + hour + ':00';
-
-        const slotBtn = document.createElement('button');
-        slotBtn.type = 'button';
-        slotBtn.className = 'btn btn-outline-secondary slot-btn m-1';
-        slotBtn.innerText = timeFormatted;
-        slotBtn.dataset.hour = hour;
-
-        // Click handler to select consecutive slots
-        slotBtn.onclick = function () {
-            selectConsecutiveSlots(hour);
-        };
-
-        slotContainer.appendChild(slotBtn);
-    }
-}
-
-/**
- * Handles the selection of duration (1, 2, or 3 hours)
- * @param {number} hours - The duration in hours
- * @param {HTMLElement} element - The clicked button element
- */
-function setDuration(hours, element) {
-    selectedDuration = hours;
-
-    // Remove active class from all duration buttons
-    document.querySelectorAll('.duration-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    // Add active class to the clicked button
-    element.classList.add('active');
-
-    // Reset slot selections when duration changes
-    clearSelectedSlots();
-}
-function clearSelectedSlots() {
-    document.querySelectorAll('.slot-btn').forEach(btn => {
-        btn.classList.remove('btn-success', 'selected');
-        btn.classList.add('btn-outline-secondary');
-    });
-}
-</script>
+    </script>
 </body>
 </html>
